@@ -1,7 +1,7 @@
 local cfg = Betting.Config;
 
 function Betting.Wrapper.addPoints(ply, amt)
-  if (!cfg.Pointshop2) then
+  if (!cfg.pointshop2) then
     ply:PS_GivePoints(amt);
   else
     ply:PS2_AddStandardPoints(amt);
@@ -9,7 +9,7 @@ function Betting.Wrapper.addPoints(ply, amt)
 end
 
 function Betting.Wrapper.takePoints(ply, amt)
-  if (!cfg.Pointshop2) then
+  if (!cfg.pointshop2) then
     ply:PS_GivePoints(-amt);
   else
     ply:PS2_AddStandardPoints(-amt);
