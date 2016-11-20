@@ -25,7 +25,7 @@ function Betting.UI.createHUD()
   local fh = 230;
   local cw = scrW / 2 - fw / 2;
   local ch = scrH / 2 - fh / 2;
-  local reward = cfg.multiplier;
+  local plyMultiplier = Betting.Wrapper.getMultiplier(ply);
 
   Betting.UI.HUDFrame = vgui.Create("EditablePanel");
   local frame = Betting.UI.HUDFrame;
@@ -43,7 +43,7 @@ function Betting.UI.createHUD()
     surface.SetDrawColor(theme.top);
     surface.DrawRect(0, 0, w, h);
 
-    draw.SimpleText("Betting (F9 cursor)", "Betting.Font.title", w/2, h/2,
+    draw.SimpleText("Betting (" .. cfg.cursorKeyName .. " cursor)", "Betting.Font.title", w/2, h/2,
       theme.text.active, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER);
   end
 
@@ -66,7 +66,7 @@ function Betting.UI.createHUD()
   multiplier:Dock(TOP);
   multiplier:SetContentAlignment(7);
   multiplier:DockMargin(5, 2.5, 0, 0);
-  multiplier:SetText("Multiplier: x" .. cfg.multiplier);
+  multiplier:SetText("Multiplier: x" .. plyMultiplier);
   multiplier:SetFont("Betting.Font.text");
   multiplier:SetMultiline(true);
   multiplier:SetWrap(true);
@@ -105,12 +105,15 @@ function Betting.UI.createHUD()
     local text = tonumber(pnl:GetText());
 
     if (text == "" or text == NULL or text == nil) then return; end
-    reward:SetText("Reward: " .. text * cfg.multiplier);
+    reward:SetText("Reward: " .. text * plyMultiplier);
   end
   local oldGetFocus = textEntry.OnGetFocus;
   textEntry.OnGetFocus = function(pnl)
     oldGetFocus(pnl);
-    if (pnl:GetText() == "Points") then pnl:SetText(""); end
+    local text = pnl:GetText();
+    text = tonumber(text);
+    if (text == nil or text == NULL or text == "") then pnl:SetText(""); end
+
     frame:MakePopup();
   end
   local oldLoseFocus = textEntry.OnLoseFocus;
@@ -138,6 +141,17 @@ function Betting.UI.createHUD()
   traitor.DoClick = function(pnl)
     local text = tonumber(textEntry:GetText());
     if (text == "" or text == NULL or text == nil) then return; end
+    text = math.abs(text);
+
+    if (text < cfg.minimumBet) then
+      textEntry:SetText("You have to bet at least " .. cfg.minimumBet);
+      return;
+    end
+
+    if (text > cfg.maximumBet and cfg.maximumBet != 0) then
+      textEntry:SetText("You can at max bet " .. cfg.maximumBet);
+      return;
+    end
 
     if (!Betting.Wrapper.canAfford(ply, text)) then
       textEntry:SetText("Cannot afford that!");
@@ -168,6 +182,17 @@ function Betting.UI.createHUD()
   innocent.DoClick = function(pnl)
     local text = tonumber(textEntry:GetText());
     if (text == "" or text == NULL or text == nil) then return; end
+    text = math.abs(text);
+
+    if (text < cfg.minimumBet) then
+      textEntry:SetText("You have to bet at least " .. cfg.minimumBet);
+      return;
+    end
+
+    if (text > cfg.maximumBet and cfg.maximumBet != 0) then
+      textEntry:SetText("You can at max bet " .. cfg.maximumBet);
+      return;
+    end
 
     if (!Betting.Wrapper.canAfford(ply, text)) then
       textEntry:SetText("Cannot afford that!");
@@ -195,7 +220,7 @@ local time = CurTime();
 Betting.clicker = false;
 
 hook.Add("Think", "Betting.Think", function()
-  if (input.IsKeyDown(KEY_F9) and time <= CurTime()) then
+  if (input.IsKeyDown(cfg.cursorKey) and time <= CurTime()) then
     local bool = !Betting.clicker;
 
     gui.EnableScreenClicker(bool);

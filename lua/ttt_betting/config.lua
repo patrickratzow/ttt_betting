@@ -5,6 +5,15 @@ Betting.Config.beginRoundTime = 15; -- How many seconds into the round shall bet
 Betting.Config.prefixColor = Color(255, 0, 0); -- [Betting] color
 Betting.Config.textColor = Color(255, 255, 255); -- Everything after [Betting] color
 Betting.Config.pointshop2 = false; -- Use Pointshop 2? If false it uses Pointshop 1
+Betting.Config.cursorKey = KEY_F9; -- What key should toggle cursor?
+Betting.Config.cursorKeyName = "F9"; -- What key is shown on the menu?
+Betting.Config.requiredPlayers = 2; -- How many players is required for betting to be activated?
+Betting.Config.minimumBet = 250; -- What is minimum bet? Don't make it negative
+Betting.Config.maximumBet = 500; -- What is maximum bet? Setting it to 0 disables this
+Betting.Config.userGroups = { -- Usergroups that have a different multiplier than normal.
+  superadmin = 3,
+  admin = 2.5
+};
 
 Betting.Theme = {
   background = Color(28, 29, 31),
